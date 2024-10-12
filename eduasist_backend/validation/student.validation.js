@@ -9,6 +9,7 @@ const studentValidationSchema = Joi.object({
   dateOfBirth: Joi.date().required(),
   genderId: Joi.number().required(),
   address: Joi.string().min(5).required(),
+  residenceId: Joi.number().required(),
   schoolId: Joi.number().required(),
   classId: Joi.number().required()
 });

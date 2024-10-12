@@ -32,6 +32,7 @@ import AddMedicineForm from './pages/EditForm_Medicine';
 import AddSomatoMMForm from './pages/EditForm_SomatoMM';
 
 import OmsIndexesList from './pages/Nomenclator_Measurements';
+import TestingPage from './pages/TestingPage';
 
 
 
@@ -92,7 +93,7 @@ const App: React.FC = () => {
                         <Route path="/nom_omsindexeslist" element={<PrivateRoute element={<OmsIndexesList />} />} />
 
 
-                        <Route path="/test_page" element={<PrivateRoute element={<ClassList />} />} />
+                        <Route path="/test_page" element={<PrivateRoute element={<TestingPage />} />} />
 
 
                     </Routes>

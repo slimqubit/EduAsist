@@ -58,10 +58,13 @@ module.exports = (sequelize, Sequelize) => {
         dateOfBirth: { type: Sequelize.DATEONLY, allowNull: false },
         genderId: { type: Sequelize.INTEGER, references: { model: 'type_gender', key: 'id' }, allowNull: false },
         address: { type: Sequelize.STRING, allowNull: false },
+        residenceId: { type: Sequelize.INTEGER, references: { model: 'type_residence', key: 'id' }, allowNull: false },
         schoolId: { type: Sequelize.INTEGER, references: { model: 'schools', key: 'id' }, allowNull: false },
         classId: { type: Sequelize.INTEGER, references: { model: 'classes', key: 'id' }, allowNull: false },
     });
 
+    Student.belongsTo(tModels.TypeResidence, { foreignKey: 'residenceId' });
+    tModels.TypeResidence.hasMany(Student, { foreignKey: 'residenceId' });
     Student.belongsTo(School, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
     School.hasMany(Student, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
     Student.belongsTo(Class, { foreignKey: 'classId', onDelete: 'CASCADE' });

@@ -134,3 +134,5 @@ Resources
 Readme.txt
 eduasist_frontend/Readme.md
 eduasist_backend/config/*.sql
+
+package-lock.json

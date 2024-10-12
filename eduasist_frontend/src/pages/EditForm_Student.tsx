@@ -8,7 +8,8 @@ import { apiClient } from '../services/apiService';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import ClassSelector from '../components/Selector_Class';
 
-import { Class, Student, TypeGender } from '../types/types';
+import { Class, Student, TypeGender, TypeResidence } from '../types/types';
+import { decodeCNP } from '../components/cmpUtils';
 
 
 interface AddStudentFormProps {
@@ -19,7 +20,7 @@ interface AddStudentFormProps {
 
 const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCancel }) => {
 
-    const { schoolId: initialSchoolId  } = useParams<{ schoolId: string }>();  // Get the id and studentId from the path   
+    const { schoolId: initialSchoolId } = useParams<{ schoolId: string }>();  // Get the id and studentId from the path   
     const schoolId = Number(initialSchoolId); // or parseInt(schoolId, 10)
 
     const { classId: paramClassId } = useParams<{ classId: string }>();
@@ -44,10 +45,12 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
         lastName: '',
         cnp: '',
         dateOfBirth: '',
+        residenceId: 0,
         genderId: 0,
         address: ''
     }
     const [student, setStudent] = useState<Student>(initialStudentState);
+    const [residences, setResidences] = useState<TypeResidence[]>([]);
     const [classes, setClasses] = useState<Class[]>([]);
     const [genders, setGenders] = useState<TypeGender[]>([]);
 
@@ -63,9 +66,26 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
     // Update classes list just on render
     useEffect(() => {
         setError(null);
+        const fetchResidences = async () => {
+            try {
+                const response = await apiClient.get(`/api/types/residences`);
+                if (response.status == 200) {
+                    const data = response.data.map((residence: TypeResidence) => ({
+                        ...residence,
+                    }));
+                    setResidences(data);
+                }
+                else {
+                    setError(response?.data?.message || 'An error occurred.');
+                }
+            } catch (error) {
+                setError(`An error occurred. ${error}`);
+            }
+        };
+
         const fetchClasses = async () => {
             if (schoolId) {
-                try {                
+                try {
                     const response = await apiClient.get(`/api/schools/${schoolId}/classes`);
                     if (response.status == 200) {
                         const classesData = response.data.map((_class: Class) => ({
@@ -101,7 +121,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
             }
         };
 
-
+        fetchResidences();
         fetchClasses();
         fetchGenders();
     }, []);
@@ -155,11 +175,25 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
         setStudent(prevState => ({ ...prevState, [name]: value }));
     };
 
+    const handleCNPChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setStudent(prevState => ({ ...prevState, [name]: value }));
+
+        if (value.length === 13) {
+            try {
+              const { gender, birthDate } = decodeCNP(value);
+              setStudent(prevState => ({ ...prevState, "genderId": gender, "dateOfBirth": formatDateForInput(birthDate) }));
+            } catch (error) {
+                //setError(error.message || 'Error decoding CNP.');
+            }
+          }              
+    };
+
     const handleClassChange = (classId: number | null) => {
         setClassId(classId);
     };
 
-    const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const { name, value } = e.target;
         setStudent(prevState => ({ ...prevState, [name]: value }));
     };
@@ -268,7 +302,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
                                                     type="text"
                                                     name="cnp"
                                                     value={student.cnp}
-                                                    onChange={handleChange}
+                                                    onChange={handleCNPChange}
                                                     required
                                                 />
                                             </Form.Group>
@@ -289,7 +323,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
                                         <Col>
                                             <Form.Group controlId="genderTypeSelector">
                                                 <Form.Label>Alegeți genul</Form.Label>
-                                                <Form.Select name="genderId" value={student.genderId} onChange={handleGenderChange} required>
+                                                <Form.Select name="genderId" value={student.genderId} onChange={handleSelectChange} required>
                                                     <option value="">Alegeți genul...</option>
                                                     {genders.map((gender) => (
                                                         <option key={gender.id} value={gender.id}>
@@ -309,22 +343,39 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
                                         </Col>
                                     </Row>
 
-                                    <Form.Group controlId="address" className="mb-3">
-                                        <Form.Label>Adresa</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="address"
-                                            value={student.address}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </Form.Group>
+                                    <Row>
+                                        <Col className="col-md-9">
+                                            <Form.Group controlId="address" className="mb-3">
+                                                <Form.Label>Adresa</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    name="address"
+                                                    value={student.address}
+                                                    onChange={handleChange}
+                                                    required
+                                                />
+                                            </Form.Group>
+                                        </Col>
+                                        <Col className="col-md-3">
+                                            <Form.Group controlId="formResidenceType" className="mb-3">
+                                                <Form.Label>Tip rezidență</Form.Label>
+                                                <Form.Select name='residenceId' value={student.residenceId} onChange={handleSelectChange} required>
+                                                    <option value="">Alegeți rezidența...</option>
+                                                    {residences.map((residence) => (
+                                                        <option key={residence.id} value={residence.id}>
+                                                            {residence.residence}
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
                                 </>
                             )}
 
                         <div className="mb-3 d-flex justify-content-end">
-                        <Button variant="secondary" className="me-2" onClick={handleCancel}>Renunță</Button>
-                        <Button variant="primary" type="submit" disabled={!schoolId} className="ms-2">{studentId ? 'Actualizare' : 'Adăugare'}</Button>
+                            <Button variant="secondary" className="me-2" onClick={handleCancel}>Renunță</Button>
+                            <Button variant="primary" type="submit" disabled={!schoolId} className="ms-2">{studentId ? 'Actualizare' : 'Adăugare'}</Button>
                         </div>
                     </Form>
                 </Col>

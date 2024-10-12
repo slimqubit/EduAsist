@@ -27,6 +27,7 @@ export interface Student {
     dateOfBirth: string;
     genderId: number;
     address: string;
+    residenceId: number;
     schoolId?: number;
     classId?: number;
     class?: Class;

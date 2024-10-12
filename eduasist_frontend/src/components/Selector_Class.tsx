@@ -74,7 +74,7 @@ const ClassSelector: React.FC<ClassSelectorProps> = ({ initialClassId, classes, 
 
     return (
         <Form.Group controlId="classSelector">
-            <Form.Label>Select Class</Form.Label>
+            <Form.Label>Clasa</Form.Label>
             <Form.Select as="select" value={selectedClassId !== null ? selectedClassId : ''} onChange={handleSelectionChange} disabled={!schoolId}>
                 <option value="">Alegeți clasa...</option>
                 {enableAll && <option value={0}>Toate clasele</option>}

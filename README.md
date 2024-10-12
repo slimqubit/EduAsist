@@ -1,2 +1,2 @@
 # EduAsist
-Asistenta Medicala in Scoli
+Evidența Asistenței Medicale în Școli

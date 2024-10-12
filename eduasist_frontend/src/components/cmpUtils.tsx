@@ -128,6 +128,42 @@ const getOmsIndex = (value: number,  idx: number, omsIdx: OmsIndexMeasurement[])
 }
 
 
+const decodeCNP = (cnp: string) => {
+    if (cnp.length !== 13) {
+      throw new Error("CNP-ul trebuie să aibă 13 cifre.");
+    }
+  
+    const genderCode = parseInt(cnp[0], 10);
+    const yearCode = parseInt(cnp.substring(1, 3), 10);
+    const monthCode = parseInt(cnp.substring(3, 5), 10);
+    const dayCode = parseInt(cnp.substring(5, 7), 10);
+  
+    // Decodarea sexului
+    let gender = 0;
+    let year = 0;
+  
+    if (genderCode === 1 || genderCode === 2) {
+      year = 1900 + yearCode;
+    } else if (genderCode === 3 || genderCode === 4) {
+      year = 1800 + yearCode;
+    } else if (genderCode === 5 || genderCode === 6) {
+      year = 2000 + yearCode;
+    } else {
+      throw new Error("CNP invalid.");
+    }
+  
+    gender = genderCode % 2 === 0 ? 1 : 2;
+  
+    // Creăm data nașterii
+    const birthDate = new Date(year, monthCode - 1, dayCode);
+  
+    return {
+      gender,
+      birthDate,
+    };
+  };
+  
+
 
 
 export { 
@@ -142,5 +178,6 @@ export {
     calculateAgeInYears,
     calculateAgeInMonths,
     calculateIMC,
-    getOmsIndex
+    getOmsIndex,
+    decodeCNP
 };

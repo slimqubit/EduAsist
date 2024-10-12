@@ -1,11 +1,21 @@
 
 import React from 'react';
 
-import { Container, Row, Col, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Button, Alert, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { apiClient } from '../services/apiService';
 
 
+import { useState } from 'react';
+
+
+
+interface Product {
+    id: number;
+    name: string;
+    expirationDate: string;
+    stock: number;
+}
 
 
 
@@ -33,6 +43,7 @@ const Dashboard: React.FC = () => {
             console.log(`Error fetching school: ${error.response?.data?.message || error.message}`);
         }
     };
+
 
 
 
