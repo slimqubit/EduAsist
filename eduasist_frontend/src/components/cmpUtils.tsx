@@ -107,7 +107,7 @@ const calculateIMC = (weight: number, height: number) => {
 }
 
 
-const getOmsIndex = (value: number,  idx: number, omsIdx: OmsIndexMeasurement[]) => {
+const getOmsIndex = (value: number, idx: number, omsIdx: OmsIndexMeasurement[]) => {
     const selectedItem: OmsIndexMeasurement | undefined = omsIdx.find(item => item.measurementId === idx);
 
     if (!selectedItem) return 0;
@@ -127,57 +127,105 @@ const getOmsIndex = (value: number,  idx: number, omsIdx: OmsIndexMeasurement[])
     }
 }
 
+const getOmsPlacement = (resHeight: number, resWeight: number): string => {
+    let sHeight = 'nedeterminat';
+    let sWeight = 'nedeterminat';
+
+    switch (resHeight) {
+        case 1:
+            sHeight = "Hipostatural gr. II";
+            break;
+        case 2:
+            sHeight = "Hipostatural gr. I";
+            break;
+        case 3:
+            sHeight = "Normostatural";
+            break;
+        case 4:
+            sHeight = "Hiperstatural gr. I";
+            break;
+        case 5:
+            sHeight = "Hiperstatural gr. II";
+            break;
+        default:
+            break;
+    }
+
+    switch (resWeight) {
+        case 1:
+            sWeight = "Subponderal f. mic";
+            break;
+        case 2:
+            sWeight = "Subponderal mic";
+            break;
+        case 3:
+            sWeight = "Normoponderal";
+            break;
+        case 4:
+            sWeight = "Supraponderal";
+            break;
+        case 5:
+            sWeight = "Obez";
+            break;
+        default:
+            break;
+    }
+
+    return `${sHeight} ${sWeight}`;
+}
+
 
 const decodeCNP = (cnp: string) => {
     if (cnp.length !== 13) {
-      throw new Error("CNP-ul trebuie să aibă 13 cifre.");
+        throw new Error("CNP-ul trebuie să aibă 13 cifre.");
     }
-  
+
     const genderCode = parseInt(cnp[0], 10);
     const yearCode = parseInt(cnp.substring(1, 3), 10);
     const monthCode = parseInt(cnp.substring(3, 5), 10);
     const dayCode = parseInt(cnp.substring(5, 7), 10);
-  
+
     // Decodarea sexului
     let gender = 0;
     let year = 0;
-  
+
     if (genderCode === 1 || genderCode === 2) {
-      year = 1900 + yearCode;
+        year = 1900 + yearCode;
     } else if (genderCode === 3 || genderCode === 4) {
-      year = 1800 + yearCode;
+        year = 1800 + yearCode;
     } else if (genderCode === 5 || genderCode === 6) {
-      year = 2000 + yearCode;
+        year = 2000 + yearCode;
     } else {
-      throw new Error("CNP invalid.");
+        throw new Error("CNP invalid.");
     }
-  
+
     gender = genderCode % 2 === 0 ? 1 : 2;
-  
+
     // Creăm data nașterii
     const birthDate = new Date(year, monthCode - 1, dayCode);
-  
+
     return {
-      gender,
-      birthDate,
+        gender,
+        birthDate,
     };
-  };
-  
+};
 
 
 
-export { 
-    LoadingData, 
-    formatDateIsoToRomanian, 
-    formatDateIsoToROM, 
-    formatDateIsoToROMEx, 
-    formatDateRomToISO, 
-    formatDateForInput, 
+
+export {
+    LoadingData,
+    formatDateIsoToRomanian,
+    formatDateIsoToROM,
+    formatDateIsoToROMEx,
+    formatDateRomToISO,
+    formatDateForInput,
     formatDateIsoToExpirationDate,
 
     calculateAgeInYears,
     calculateAgeInMonths,
     calculateIMC,
     getOmsIndex,
+    getOmsPlacement,
     decodeCNP
 };

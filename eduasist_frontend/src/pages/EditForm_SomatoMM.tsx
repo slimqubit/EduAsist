@@ -1,7 +1,7 @@
 // src/components/AddSomatoMMForm.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Alert, Table } from 'react-bootstrap';
 import { LoadingData } from '../components/cmpUtils';
 
 import { apiClient } from '../services/apiService';
@@ -11,7 +11,7 @@ import { StudentInfo } from '../components/cmpStudent';
 
 import { SomatoMM, Student, OmsIndexMeasurement } from '../types/types';
 
-import { calculateAgeInYears, calculateAgeInMonths, calculateIMC, getOmsIndex } from '../components/cmpUtils';
+import { calculateAgeInYears, calculateAgeInMonths, calculateIMC, getOmsIndex, getOmsPlacement } from '../components/cmpUtils';
 
 
 const initialStudentState: Student = {
@@ -19,6 +19,7 @@ const initialStudentState: Student = {
     lastName: '',
     cnp: '',
     dateOfBirth: '',
+    residenceId: 0,
     genderId: 0,
     address: ''
 }
@@ -41,12 +42,12 @@ const initialSomatoMMState: SomatoMM = {
 
 
 interface AddSomatoMMFormProps {
-    onStudentAdded?: () => void;
+    onSomatoMMAdded?: () => void;
     onCancel?: () => void;
 }
 
 
-const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCancel }) => {
+const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onSomatoMMAdded, onCancel }) => {
 
     const { schoolId: initialSchoolId } = useParams<{ schoolId: string }>();  // Get the id and studentId from the path   
     const schoolId = Number(initialSchoolId); // or parseInt(schoolId, 10)
@@ -54,14 +55,14 @@ const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCan
 
     const [student, setStudent] = useState<Student>(initialStudentState);
 
-    const { id, studentId } = useParams<{ id?: string; studentId: string }>();  // Get the id and studentId from the path                   
+    const { somatommId, studentId } = useParams<{ somatommId?: string; studentId: string }>();  // Get the id and studentId from the path                   
 
 
 
 
     const location = useLocation();
     const navigate = useNavigate();
-    const returnTo = location.state?.returnTo || "/students";
+    const returnTo = location.state?.returnTo || `/schools/${schoolId}/classes/students/medicalrecord`;
 
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -87,10 +88,10 @@ const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCan
 
     useEffect(() => {
         const fetchSomatoMM = async () => {
-            if (id) {
+            if (somatommId) {
                 setLoading(true);
                 try {
-                    const response = await apiClient.get(`/api/somatomm/${studentId}/${id}`);
+                    const response = await apiClient.get(`/api/somatomm/${studentId}/${somatommId}`);
 
                     if (response.status === 200) {
                         const somatoMMData = response.data;
@@ -139,7 +140,7 @@ const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCan
 
         fetchSomatoMM();
         fetchStudent();
-    }, [id]);
+    }, [somatommId]);
 
 
 
@@ -164,11 +165,10 @@ const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCan
         try {
 
             const ageMonths = calculateAgeInMonths(new Date(student.dateOfBirth), new Date(somatoMM.measurementDate));
-            const residenceId = 1;
             let omsIndex = [];
 
             try {
-                const response = await apiClient.get(`/api//types/omsindexmeasurements/byage/${residenceId}/${student.genderId}/${ageMonths}`);
+                const response = await apiClient.get(`/api/types/omsindexmeasurements/byage/${student.residenceId}/${student.genderId}/${ageMonths}`);
                 if (response.status === 200) {
                     const data = response.data.map((omsIndexMeasurement: OmsIndexMeasurement) => ({
                         ...omsIndexMeasurement,
@@ -199,14 +199,14 @@ const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCan
 
 
             //alert(schoolId);
-            const request = id
-                ? apiClient.put(`/api/somatomm/${studentId}/${id}`, updatedSomatoMM)
+            const request = somatommId
+                ? apiClient.put(`/api/somatomm/${studentId}/${somatommId}`, updatedSomatoMM)
                 : apiClient.post(`/api/somatomm/${studentId}/`, updatedSomatoMM);
 
             const response = await request;
             if (response.status === 201 || response.status === 200) {
                 setSomatoMM(initialSomatoMMState);
-                if (typeof onStudentAdded === 'function') onStudentAdded();
+                if (typeof onSomatoMMAdded === 'function') onSomatoMMAdded();
                 navigate(returnTo);
             }
             else {
@@ -237,12 +237,12 @@ const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCan
         <Container>
             <Row className="justify-content-md-center">
                 <Col xs={12} md={12}>
-                    <h3 className="text-center my-4">{id ? 'Actualizare' : 'Adăugare'} măsurătoare somato metrică</h3>
+                    <h3 className="text-center my-4">{somatommId ? 'Actualizare' : 'Adăugare'} măsurătoare somato metrică</h3>
                     {error && <Alert key="danger" variant="danger">{error}</Alert>}
 
                     <StudentInfo loading={loading} student={student} />
 
-                    <Form onSubmit={handleSubmit} className="mb-3">
+                    <Form onSubmit={handleSubmit} className="mb-3 mt-5">
                         {loading
                             ? (<LoadingData />)
                             : (
@@ -268,24 +268,6 @@ const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCan
                                             </Form.Group>
                                         </Col>
                                         <Col>
-                                            <Form.Group controlId="formWeight" className="mb-3">
-                                                <Form.Label>Greutate [kg]</Form.Label>
-                                                <Form.Control
-                                                    type="number"
-                                                    name="weight"
-                                                    step="0.01"
-                                                    min="0"
-                                                    value={somatoMM.weight}
-                                                    onChange={handleChange}
-                                                    placeholder="Enter weight"
-                                                    isInvalid={somatoMM.weight < 0}
-                                                />
-                                                <Form.Control.Feedback type="invalid">
-                                                    Please enter a valid weight.
-                                                </Form.Control.Feedback>
-                                            </Form.Group>
-                                        </Col>
-                                        <Col>
                                             <Form.Group controlId="formHeight" className="mb-3">
                                                 <Form.Label>Înălțime [cm]</Form.Label>
                                                 <Form.Control
@@ -303,9 +285,24 @@ const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCan
                                                 </Form.Control.Feedback>
                                             </Form.Group>
                                         </Col>
-                                    </Row>
-
-                                    <Row>
+                                        <Col>
+                                            <Form.Group controlId="formWeight" className="mb-3">
+                                                <Form.Label>Greutate [kg]</Form.Label>
+                                                <Form.Control
+                                                    type="number"
+                                                    name="weight"
+                                                    step="0.01"
+                                                    min="0"
+                                                    value={somatoMM.weight}
+                                                    onChange={handleChange}
+                                                    placeholder="Enter weight"
+                                                    isInvalid={somatoMM.weight < 0}
+                                                />
+                                                <Form.Control.Feedback type="invalid">
+                                                    Please enter a valid weight.
+                                                </Form.Control.Feedback>
+                                            </Form.Group>
+                                        </Col>
                                         <Col>
                                             <Form.Group controlId="formChestCircumference" className="mb-3">
                                                 <Form.Label>Circumferința pieptului [cm]</Form.Label>
@@ -350,8 +347,49 @@ const AddSomatoMMForm: React.FC<AddSomatoMMFormProps> = ({ onStudentAdded, onCan
 
                         <div className="mb-3 d-flex justify-content-end">
                             <Button variant="secondary" className="me-2" onClick={handleCancel}>Renunță</Button>
-                            <Button variant="primary" type="submit" disabled={!studentId} className="ms-2">{id ? 'Actualizare' : 'Adăugare'}</Button>
+                            <Button variant="primary" type="submit" disabled={!studentId} className="ms-2">{somatommId ? 'Actualizare' : 'Adăugare'}</Button>
                         </div>
+                    </Form>
+
+                    <Form className="mb-3">
+                        {loading
+                            ? (<></>)
+                            : (
+                                <>
+                                    <h4 className="fw-light">Rezultate măsurători</h4>
+                                    <hr className="border-top border-primary my-1 opacity-25" />
+
+                                    <Row className="my-3">
+                                        <Col>
+
+                                            <Table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Indice masă<br />corporală</th>
+                                                        <th style={{ textAlign: 'center' }}>Rezultat<br />Înălțime</th>
+                                                        <th style={{ textAlign: 'center' }}>Rezultat<br />Greutate</th>
+                                                        <th style={{ textAlign: 'center' }}>Rezultat<br />Circ. Cap</th>
+                                                        <th style={{ textAlign: 'center' }}>Rezultat<br />Circ. Piept</th>
+                                                        <th style={{ textAlign: 'center' }}>Interpretare<br />IMC & Înălțime</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>{somatoMM.resImc}</td>
+                                                        <td style={{ textAlign: 'center' }}>i{somatoMM.resHeight}</td>
+                                                        <td style={{ textAlign: 'center' }}>g{somatoMM.resWeight}</td>
+                                                        <td style={{ textAlign: 'center' }}>c{somatoMM.resCHead}</td>
+                                                        <td style={{ textAlign: 'center' }}>p{somatoMM.resCHead}</td>
+                                                        <td style={{ textAlign: 'center' }}><strong>{somatoMM.resHeight && somatoMM.resWeight
+                                                            ? (getOmsPlacement(somatoMM.resHeight, somatoMM.resWeight)) : (<></>)}</strong>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </Table>
+                                        </Col>
+                                    </Row>
+                                </>
+                            )}
                     </Form>
                 </Col>
             </Row>

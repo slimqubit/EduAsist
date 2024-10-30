@@ -30,7 +30,7 @@ module.exports = (app) => {
     router.get('/utils/initialize_data/add_typedata', async (req, res) => {
         try {
             // Read the SQL file
-            const sqlFilePath = path.join(__dirname, '..\\config', 'omsTypeData.sql');
+            const sqlFilePath = path.join(__dirname, '..\\config', 'EduAsist_typeData.sql');
             const sqlQuery = fs.readFileSync(sqlFilePath, 'utf8');
             const sqlStatements = sqlQuery.split(';').filter(statement => statement.trim() !== '');
 
@@ -50,7 +50,7 @@ module.exports = (app) => {
     router.get('/utils/initialize_data/add_sampledata', async (req, res) => {
         try {
             // Read the SQL file
-            const sqlFilePath = path.join(__dirname, '..\\config', 'omsSampleData.sql');
+            const sqlFilePath = path.join(__dirname, '..\\config', 'EduAsist_sampleData.sql');
             const sqlQuery = fs.readFileSync(sqlFilePath, 'utf8');
             const sqlStatements = sqlQuery.split(';').filter(statement => statement.trim() !== '');
 
@@ -70,7 +70,7 @@ module.exports = (app) => {
     router.get('/utils/drop_tables', async (req, res) => {
         try {
             // Read the SQL file
-            const sqlFilePath = path.join(__dirname, '..\\config', 'dropTables.sql');
+            const sqlFilePath = path.join(__dirname, '..\\config', 'EduAsist_dropTables.sql');
             const sqlQuery = fs.readFileSync(sqlFilePath, 'utf8');
             const sqlStatements = sqlQuery.split(';').filter(statement => statement.trim() !== '');
 

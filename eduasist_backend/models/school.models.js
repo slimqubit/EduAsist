@@ -18,6 +18,10 @@ module.exports = (sequelize, Sequelize) => {
         address: { type: Sequelize.STRING, allowNull: false },
         residenceId: { type: Sequelize.INTEGER, references: { model: 'type_residence', key: 'id' }, allowNull: false },
         userId: { type: Sequelize.INTEGER, references: { model: 'users', key: 'id' }, allowNull: false },
+        has101grades: { type: Sequelize.BOOLEAN, defaultValue: false, allowNull: false }, // ciclul primar 0 - 4 clase
+        has102grades: { type: Sequelize.BOOLEAN, defaultValue: false, allowNull: false }, // ciclul gimnazial 5 - 8 clase
+        has103grades: { type: Sequelize.BOOLEAN, defaultValue: false, allowNull: false }, // ciclul liceal 9 - 12 clase
+        has104grades: { type: Sequelize.BOOLEAN, defaultValue: false, allowNull: false }, // ciclul liceal/p 9 - 13 clase
     });
 
     User.hasMany(School, { foreignKey: 'userId', onDelete: 'CASCADE' });

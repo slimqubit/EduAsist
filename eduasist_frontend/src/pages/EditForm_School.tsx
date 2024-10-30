@@ -6,7 +6,7 @@ import { LoadingData } from '../components/cmpUtils';
 import { apiClient } from '../services/apiService';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 
-import {School, TypeResidence} from '../types/types';
+import { School, TypeResidence } from '../types/types';
 
 
 interface AddSchoolFormProps {
@@ -36,6 +36,11 @@ const AddSchoolForm: React.FC<AddSchoolFormProps> = ({ onSchoolAdded, onCancel }
         county: '',
         address: '',
         residenceId: 0,
+        has101grades: false,
+        has102grades: false,
+        has103grades: false,
+        has104grades: false,
+
     };
     const [school, setSchool] = useState<School>(initialSchoolState);
     const [residences, setResidences] = useState<TypeResidence[]>([]);
@@ -88,15 +93,24 @@ const AddSchoolForm: React.FC<AddSchoolFormProps> = ({ onSchoolAdded, onCancel }
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSchool({ ...school, [e.target.name]: e.target.value });
+        setSchool((prevSchool) => ({ ...prevSchool, [e.target.name]: e.target.value, }));
     };
 
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSchool({ ...school, [e.target.name]: e.target.value });
+        setSchool((prevSchool) => ({ ...prevSchool, [e.target.name]: e.target.value, }));
     };
 
 
+    // Handle checkbox change
+    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = event.target;
+        setSchool((prevSchool) => ({
+            ...prevSchool,
+            [name]: checked,  // Update the checkbox value (true/false)
+        }));
+    };
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -198,24 +212,40 @@ const AddSchoolForm: React.FC<AddSchoolFormProps> = ({ onSchoolAdded, onCancel }
                                                     ))}
                                                 </Form.Select>
                                             </Form.Group>
-                                            {/*
-                                <Form.Group controlId="formResidenceType" className="mb-3">
-                                    <Form.Label>Tip rezidență</Form.Label>
-                                    <Form.Select name="residenceType" value={school.residenceType} onChange={handleSelectChange} required>
-                                        <option value="">Selectati rezidența</option>
-                                        <option value="urban">Urban</option>
-                                        <option value="rural">Rural</option>
-                                    </Form.Select>
-                                </Form.Group>
-                                        */}
                                         </Col>
                                     </Row>
+
+                                    <Form.Group controlId="formHasPrimarySchool" className="mb-0">
+                                        <Form.Label>Planul de scolarizare al școlii cuprinde următoarele niveluri de studiu:</Form.Label>
+                                    </Form.Group>
+                                    <Form.Group controlId="formHasPrimarySchool" className="mb-1 ms-4">
+                                        <Form.Check type="checkbox" name="has101grades" checked={school.has101grades} onChange={handleCheckboxChange}
+                                            label="Învățământul Primar - clasele: pregătitoare + I - IV"
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="formHasLowerSecondarySchool" className="mb-1 ms-4">
+                                        <Form.Check type="checkbox" name="has102grades" checked={school.has102grades} onChange={handleCheckboxChange}
+                                            label="Învățământul Gimnazial - clasele: V - VIII"
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="formHasSecondarySchool" className="mb-1 ms-4">
+                                        <Form.Check type="checkbox" name="has103grades" checked={school.has103grades} onChange={handleCheckboxChange}
+                                            label="Include Învățământul liceal - clasele: IX - XII"
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="formHasSecondaryVocationalSchool" className="mb-3 ms-4">
+                                        <Form.Check type="checkbox" name="has104grades" checked={school.has104grades} onChange={handleCheckboxChange}
+                                            label="Include Învățământul liceal + profesional - clasele: IX - XIII"
+                                        />
+                                    </Form.Group>
+
+
 
                                 </>
                             )}
                         <div className="mb-3 d-flex justify-content-end">
-                        <Button variant="secondary" className="me-2" onClick={handleCancel}>Renunță</Button>
-                        <Button variant="primary" type="submit" className="ms-2">{schoolId ? 'Actualizare' : 'Adăugare'}</Button>
+                            <Button variant="secondary" className="me-2" onClick={handleCancel}>Renunță</Button>
+                            <Button variant="primary" type="submit" className="ms-2">{schoolId ? 'Actualizare' : 'Adăugare'}</Button>
                         </div>
                     </Form>
                 </Col>

@@ -37,6 +37,8 @@ module.exports = (sequelize, Sequelize) => {
     tModels.TypeResidence.hasMany(OmsIndexMeasurements, { foreignKey: 'residenceId' });
     OmsIndexMeasurements.belongsTo(tModels.TypeResidence, { foreignKey: 'residenceId' });
 
+    
+
 
     return OmsIndexMeasurements;
 };

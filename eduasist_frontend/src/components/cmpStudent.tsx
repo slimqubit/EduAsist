@@ -1,6 +1,6 @@
 // StudentInfo.js
 import React, { useState } from 'react';
-import { Row, Form, ListGroup, Badge } from 'react-bootstrap';
+import { Col, Row, Form, ListGroup, Badge, Card, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { formatDateIsoToRomanian, LoadingData } from './cmpUtils';
 import { Student } from '../types/types';
@@ -16,29 +16,24 @@ interface StudentInfoProps {
 const StudentInfo: React.FC<StudentInfoProps> = ({ loading, student }) => {
     return (
         <div>
-            <h4 className="fw-light">Informații elev</h4>
+            <h4 className="fw-light">Elev <span className="fw-medium">{student.lastName} {student.firstName}</span></h4>
             <hr className="border-top border-primary my-1 opacity-25" />
 
             <Form className="my-3">
                 {loading ? (
                     <LoadingData />
                 ) : (
-                    <Row>
-                        <dl className="row">
-                            <dd className="col-sm-3">Numele și prenumele:</dd>
-                            <dt className="col-sm-3 fw-medium">{student.firstName} {student.lastName}</dt>
-                            <dd className="col-sm-3">CNP:</dd>
-                            <dt className="col-sm-3 fw-medium">{student.cnp}</dt>
-                            <dd className="col-sm-3">Clasa:</dd>
-                            <dt className="col-sm-3 fw-medium">{student.class?.name}</dt>
-                            <dd className="col-sm-3">Data nașterii:</dd>
-                            <dt className="col-sm-3 fw-medium">{formatDateIsoToRomanian(student.dateOfBirth)}</dt>
-                            <dd className="col-sm-3">Diriginte:</dd>
-                            <dt className="col-sm-3 fw-medium">{student.class?.class_master}</dt>
-                            <dd className="col-sm-3">Sexul:</dd>
-                            <dt className="col-sm-3 fw-medium">{student.type_gender?.gender}</dt>
-                        </dl>
-                    </Row>
+                    <Table>
+                        <tbody>
+                            <tr style={{ borderStyle: 'none' }}>
+                                <td style={{ padding: '0', borderStyle: 'none' }}>CNP: <strong>{student.cnp}</strong></td>
+                                <td style={{ padding: '0', borderStyle: 'none' }}>Data nașterii: <strong>{formatDateIsoToRomanian(student.dateOfBirth)}</strong></td>
+                                <td style={{ padding: '0', borderStyle: 'none' }}>Sex: <strong>{student.type_gender?.gender}</strong></td>
+                                <td style={{ padding: '0', borderStyle: 'none', textAlign: 'center' }}>Clasa: <strong>{student.class?.name}</strong></td>
+                                <td style={{ padding: '0', borderStyle: 'none', textAlign: 'right' }}>Diriginte: <strong>{student.class?.class_master}</strong></td>
+                            </tr>
+                        </tbody>
+                    </Table>
                 )}
             </Form>
         </div>
@@ -135,8 +130,37 @@ const StudentSelector: React.FC<StudentSelectorProps> = ({ students, onStudentSe
 
 
 
+interface UserInfoProps {
+    fullName: string;
+    address: string;
+    dateOfBirth: string;
+    age: number;
+    email: string;
+}
+
+const UserInfoCard: React.FC<UserInfoProps> = ({ fullName, address, dateOfBirth, age, email }) => {
+    return (
+        <Card className="mb-3 shadow-sm">
+            <Card.Body>
+                <Card.Title className="text-center">{fullName}</Card.Title>
+                <Row>
+                    <Col md={6}>
+                        <Card.Text><strong>Date of Birth:</strong> {dateOfBirth}</Card.Text>
+                        <Card.Text><strong>Age:</strong> {age} years</Card.Text>
+                    </Col>
+                    <Col md={6}>
+                        <Card.Text><strong>Email:</strong> {email}</Card.Text>
+                        <Card.Text><strong>Address:</strong> {address}</Card.Text>
+                    </Col>
+                </Row>
+            </Card.Body>
+        </Card>
+    );
+};
+
+export default UserInfoCard;
 
 
 
 
-export { StudentInfo, EditStudentButton, StudentSelector };
+export { StudentInfo, EditStudentButton, StudentSelector, UserInfoCard };

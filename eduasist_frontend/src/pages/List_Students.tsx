@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Alert, Table} from 'react-bootstrap';
+import { Container, Row, Col, Alert, Table } from 'react-bootstrap';
 import { useLocation, useParams, Link } from 'react-router-dom';
 import { LoadingData } from '../components/cmpUtils';
 
@@ -30,9 +30,9 @@ const StudentList: React.FC = () => {
     const [students, setStudents] = useState<Student[]>([]);
     const { confirmDelete, ConfirmDeleteDialogComponent } = useConfirmDeleteDialog();
 
-    const [returnToState, setReturnToState] = useState<string>(classId?`${location.pathname}?classId=${classId}`:`${location.pathname}`);
+    const [returnToState, setReturnToState] = useState<string>(classId ? `${location.pathname}?classId=${classId}` : `${location.pathname}`);
 
-    
+
     const formatDateForDisplay = (dateString: string | number | Date) => {
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
@@ -58,7 +58,7 @@ const StudentList: React.FC = () => {
     const handleDelete = async (id: string, name: string) => {
         const confirmed = await confirmDelete(`Urmeaza să ștergeți elevul: "${name}"\n\nȘtergerea datelor este ireversibilă. Doriți să continuați?`);
         if (confirmed) {
-            apiClient.delete(`/api/schools/${schoolId}/students${id}`)
+            apiClient.delete(`/api/schools/${schoolId}/students/${id}`)
                 .then(() => setStudents(students.filter(student => student.id !== id)))
                 .catch(error => console.error('Error deleting student:', error));
         }
@@ -99,7 +99,7 @@ const StudentList: React.FC = () => {
             if (schoolId) {
                 try {
                     setLoading(true);
-                    const request = (classId === 0)
+                    const request = (classId === 111)
                         ? apiClient.get(`/api/schools/${schoolId}/students/inschool`)
                         : apiClient.get(`/api/schools/${schoolId}/students/inclass/${classId}`);
 
@@ -144,6 +144,7 @@ const StudentList: React.FC = () => {
                             initialClassId={classId}
                             classes={classes}
                             enableAll={true}
+                            enableGroup={false}
                             onSelectionChange={handleClassChange}
 
                         />
@@ -175,7 +176,7 @@ const StudentList: React.FC = () => {
                                                                 to={{
                                                                     pathname: `/schools/${student.schoolId}/classes/${student.classId}/students/edit/${student.id}`,
                                                                 }}
-                                                                state={{ returnTo: `${location.pathname}` }} // State Object
+                                                                state={{ returnTo: `${returnToState}` }} // State Object
                                                                 className="btn btn-warning btn-sm me-2"
                                                             >
                                                                 <i className="bi bi-pencil-square"></i>
@@ -185,7 +186,7 @@ const StudentList: React.FC = () => {
                                                                 to={{
                                                                     pathname: `/schools/${student.schoolId}/classes/${student.classId}/students/${student.id}/medicalrecord`,
                                                                 }}
-
+                                                                state={{ returnTo: `${returnToState}` }} // State Object
                                                                 className="btn btn-warning btn-sm me-2"
                                                             >
                                                                 <i className="bi bi-info-circle"></i>

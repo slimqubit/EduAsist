@@ -1,12 +1,10 @@
 
 import React from 'react';
+import { useState } from 'react';
 
 import { Container, Row, Col, Button, Alert, Table } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { apiClient } from '../services/apiService';
 
-
-import { useState } from 'react';
+import UserInfoCard from '../components/cmpStudent';
 
 
 
@@ -84,7 +82,13 @@ const TestingPage: React.FC = () => {
     };
 
 
-
+    const user = {
+        fullName: "John Doe",
+        address: "123 Main St, Springfield, USA",
+        dateOfBirth: "1990-01-01",
+        age: 34,
+        email: "john.doe@example.com"
+    };
 
 
 
@@ -210,6 +214,12 @@ const TestingPage: React.FC = () => {
             )}
             <Row className="my-4">
             </Row>
+
+            <div className="container">
+                <h2 className="my-4">User Information</h2>
+                <UserInfoCard {...user} />
+            </div>
+
 
         </Container>
     );

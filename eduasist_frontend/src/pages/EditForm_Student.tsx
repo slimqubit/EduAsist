@@ -20,6 +20,7 @@ interface AddStudentFormProps {
 
 const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCancel }) => {
 
+    
     const { schoolId: initialSchoolId } = useParams<{ schoolId: string }>();  // Get the id and studentId from the path   
     const schoolId = Number(initialSchoolId); // or parseInt(schoolId, 10)
 
@@ -128,6 +129,22 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
 
 
     useEffect(() => {
+        if (schoolId) {
+            setStudent(prevState => ({
+                ...prevState,
+                schoolId: schoolId,  // Update somatoMM with studentId
+            }));
+        }
+        if (classId) {
+            setStudent(prevState => ({
+                ...prevState,
+                classId: classId,  // Update somatoMM with studentId
+            }));
+        }
+    }, [schoolId, classId]);
+
+    
+    useEffect(() => {
         const fetchStudent = async () => {
             if (studentId) {
                 setLoading(true);
@@ -191,6 +208,8 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
 
     const handleClassChange = (classId: number | null) => {
         setClassId(classId);
+        if (classId)
+            setStudent(prevState => ({ ...prevState, classId: classId }));
     };
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -216,8 +235,6 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
             setStudent({
                 ...student,
                 dateOfBirth: formatDateForInput(student.dateOfBirth), // Format for input
-                schoolId: schoolId,
-                classId: classId,
             });
 
             //alert(schoolId);
@@ -338,6 +355,7 @@ const AddStudentForm: React.FC<AddStudentFormProps> = ({ onStudentAdded, onCance
                                                 initialClassId={classId}
                                                 classes={classes}
                                                 enableAll={false}
+                                                enableGroup={false}
                                                 onSelectionChange={handleClassChange}
                                             />
                                         </Col>

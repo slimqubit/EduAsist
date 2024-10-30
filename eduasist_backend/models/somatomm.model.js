@@ -26,9 +26,8 @@ module.exports = (sequelize, Sequelize) => {
 
     });
  
-    Student.hasMany(SomatometricMeasurement, {foreignKey: 'studentId', onDelete: 'CASCADE'});
-    SomatometricMeasurement.belongsTo(Student, { foreignKey: 'studentId', onDelete: 'CASCADE' });
+    Student.hasMany(SomatometricMeasurement, {foreignKey: 'studentId', onDelete: 'CASCADE', as: 'measurements'});
+    SomatometricMeasurement.belongsTo(Student, { foreignKey: 'studentId', onDelete: 'CASCADE',  as: 'student', });
     
-
     return SomatometricMeasurement;
 };

@@ -15,6 +15,8 @@ import useGiveMedicineDialog from '../components/dlgGiveMedicine';
 import { Student, SomatoMM } from '../types/types';
 import { StudentSelector } from '../components/cmpStudent';
 
+import { getOmsPlacement } from '../components/cmpUtils';
+
 
 const initialStudentState = {
     firstName: '',
@@ -43,8 +45,10 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
     const location = useLocation(); // Get state and query parameters
     const navigate = useNavigate();
 
+    //    const returnToState = useState<string>(`${location.pathname}`);
+    const [returnToState, setReturnToState] = useState<string>(classId ? `${location.pathname}?classId=${classId}` : `${location.pathname}`);
 
-    const returnToState = useState<string>(location.state ? location.state : {});
+
 
     //    const queryParams = new URLSearchParams(location.search);
 
@@ -54,12 +58,12 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
 
     //    const selectedSchool = storageService.getSelectedSchool();
     //    const schoolId = selectedSchool ? selectedSchool.id : null;
- 
+
     const [students, setStudents] = useState<Student[]>([]);
 
 
 
-    const defaultReturnTo = `${location.pathname}?classId=${classId}&studentId=${studentId}`;
+
 
 
 
@@ -179,7 +183,7 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
                 <Col >
                     <Row>
                         <Col className="col-md-8">
-                            <h3 className="my-4">Dosar medical elev</h3>
+                            <h3 className="my-4">Fișa medicală a elevului</h3>
                         </Col>
 
                         <Col className="my-4 col-md-4">
@@ -208,7 +212,7 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
                                                 {0 > 0 ?
                                                     (
                                                         <Table>
-                                                            
+
                                                         </Table>
 
                                                     ) : (
@@ -225,13 +229,12 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
                                 <div className="mb-3 d-flex justify-content-end">
                                     <Link
                                         to={{
-                                            pathname: `/students/edit/${student.id}`,
-                                            search: `?classId=${student.classId}`,
+                                            pathname: `/schools/${schoolId}/classes/${student.classId}/students/${student.id}/consultation/add`,
                                         }}
-                                        state={{ returnTo: { returnToState } }} // State Object
+                                        state={{ returnTo: `${returnToState}` }} // State Object
                                         className="btn btn-primary btn-sm mb-3"
                                     >
-                                        Realizează un nou examen clinic
+                                        Realizează o nouă consultație
                                     </Link>
                                     <Button
                                         className="btn btn-primary btn-sm mb-3 ms-2"
@@ -255,17 +258,11 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
                                                         <Table>
                                                             <thead>
                                                                 <tr>
-                                                                    <th>Data<br />măsurătorii</th>
-                                                                    <th>Vârsta<br />OMS</th>
-                                                                    <th>Greutatea</th>
-                                                                    <th>Înălțimea</th>
-                                                                    <th>Circum.<br />Cap</th>
-                                                                    <th>Perime.<br />Piept</th>
+                                                                    <th>Data măsurătorii</th>
+                                                                    <th>Vârsta OMS</th>
                                                                     <th>IMC</th>
-                                                                    <th>Rezultat<br />Greutate</th>
-                                                                    <th>Rezultat<br />Înălțime</th>
-                                                                    <th>Rezultat<br />C. Cap</th>
-                                                                    <th>Rezultat<br />P. Pie</th>
+                                                                    <th>Rez. Înălț/Gre</th>
+                                                                    <th>Interpretare IMC & Înălțime</th>
                                                                     <th className="actions-center">Acțiuni</th>
                                                                 </tr>
                                                             </thead>
@@ -274,21 +271,16 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
                                                                     <tr key={somatoMM.id}>
                                                                         <td>{somatoMM.measurementDate}</td>
                                                                         <td>{somatoMM.omsAge}</td>
-                                                                        <td>{somatoMM.weight} kg</td>
-                                                                        <td>{somatoMM.height} cm</td>
-                                                                        <td>{somatoMM.headCircumference} cm</td>
-                                                                        <td>{somatoMM.chestCircumference} cm</td>
                                                                         <td>{somatoMM.resImc}</td>
-                                                                        <td>h{somatoMM.resWeight}</td>
-                                                                        <td>i{somatoMM.resHeight}</td>
-                                                                        <td>c{somatoMM.resCHead}</td>
-                                                                        <td>p{somatoMM.resCHead}</td>
+                                                                        <td>i{somatoMM.resHeight} / g{somatoMM.resWeight}</td>
+                                                                        <td><strong>{somatoMM.resHeight && somatoMM.resWeight
+                                                                            ? (getOmsPlacement(somatoMM.resHeight, somatoMM.resWeight)) : (<></>)}</strong></td>
                                                                         <td className="actions-end">
                                                                             <Link
                                                                                 to={{
-                                                                                    pathname: `/students/${studentId}/somatomm/edit/${somatoMM.id}`,
+                                                                                    pathname: `/schools/${schoolId}/classes/${classId}/students/${studentId}/somatomm/edit/${somatoMM.id}`,
                                                                                 }}
-                                                                                state={{ returnTo: `${defaultReturnTo}` }} // State Object
+                                                                                state={{ returnTo: `${returnToState}` }} // State Object
                                                                                 className="btn btn-warning btn-sm me-2"
                                                                             >
                                                                                 <i className="bi bi-pencil-square"></i>
@@ -322,12 +314,9 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
                                     <Link
                                         to={{
                                             pathname: `/schools/${schoolId}/classes/${student.classId}/students/${student.id}/somatomm/add`,
-                                            //search: `?classId=${student.classId}`,
                                         }}
-                                        state={{ returnTo: { returnToState } }} // State Object
-                                        className="btn btn-primary btn-sm mb-3"
-                                    >
-                                        Realizează o nouă măsurătoare
+                                        state={{ returnTo: `${returnToState}` }} // State Object
+                                        className="btn btn-primary btn-sm mb-3">Realizează o nouă măsurătoare
                                     </Link>
                                 </div>
                             </>
@@ -336,15 +325,12 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
 
                         : (
                             <Row className="mb-4 ">
-                            <Alert key="secondary" variant="secondary" className="my-2">
-                                <i className="bi bi-exclamation-triangle me-2"></i>
-                                Nu a fost selectat niciun elev. Utilizați zona de căutare pentru a alege un elev.
-                            </Alert>
+                                <Alert key="secondary" variant="secondary" className="my-2">
+                                    <i className="bi bi-exclamation-triangle me-2"></i>
+                                    Nu a fost selectat niciun elev. Utilizați zona de căutare pentru a alege un elev.
+                                </Alert>
                             </Row>
                         )}
-
-
-
                 </Col>
             </Row>
 

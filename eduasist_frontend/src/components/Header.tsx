@@ -57,10 +57,15 @@ const Header: React.FC = () => {
 
                                     <NavDropdown title="Elevi" id="basic-nav-dropdown">
                                         <NavDropdown.Item href={`/schools/${schoolId}/classes/students`}>Lista elevi pe clase</NavDropdown.Item>
-                                        <NavDropdown.Item href={`/schools/${schoolId}/classes/students/medicalrecord`}>Dosarul medical al elevului</NavDropdown.Item>
+                                        <NavDropdown.Item href={`/schools/${schoolId}/classes/students/medicalrecord`}>Fișa medicală a elevului</NavDropdown.Item>
                                         <NavDropdown.Divider />
                                         <NavDropdown.Item href={`/schools/${schoolId}/classes/students/add`}>Adaugă un elev nou</NavDropdown.Item>
                                     </NavDropdown>
+
+                                    <NavDropdown title="Rapoarte" id="basic-nav-dropdown">
+                                        <NavDropdown.Item href={`/schools/${schoolId}/reports/somatomm`}>Raport măsurători Somato-metrice</NavDropdown.Item>
+                                    </NavDropdown>
+
 
                                     <NavDropdown title="Nomenclatoare" id="basic-nav-dropdown">
                                         <NavDropdown.Item href="/medicine_edit">Stoc cabinet medical</NavDropdown.Item>

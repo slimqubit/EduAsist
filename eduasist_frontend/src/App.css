@@ -117,3 +117,26 @@ footer {
     border-radius: 4px;
     /* Optional: rounds the corners */
 }
+
+
+
+.report-table {
+    font-family: "Arial Narrow", Arial, sans-serif;
+}
+
+.report-table td,
+.report-table th {
+    text-align: center;
+}
+
+/* Exclude the first and last column from centering */
+.report-table td:first-child,
+.report-table th:first-child {
+    text-align: left; /* or you can use other alignment like 'right' */
+}
+.report-table td:last-child {
+    text-align: left; /* or you can use other alignment like 'right' */
+}
+.report-table th:last-child {
+    text-align: left; /* or you can use other alignment like 'right' */
+}

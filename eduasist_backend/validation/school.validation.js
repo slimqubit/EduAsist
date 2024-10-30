@@ -10,7 +10,11 @@ const schoolValidationSchema = Joi.object({
   county: Joi.string().min(3).required(),
   address: Joi.string().min(5).required(),
   residenceId: Joi.number().required(),
-  userId: Joi.number().required()
+  userId: Joi.number().required(),
+  has101grades: Joi.boolean().required(),
+  has102grades: Joi.boolean().required(),
+  has103grades: Joi.boolean().required(),
+  has104grades: Joi.boolean().required(),
 });
 
 module.exports = schoolValidationSchema;

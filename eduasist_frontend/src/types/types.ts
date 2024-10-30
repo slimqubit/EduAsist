@@ -8,6 +8,10 @@ export interface School {
     county: string;
     address: string;
     residenceId: number;
+    has101grades: boolean;
+    has102grades: boolean;
+    has103grades: boolean;
+    has104grades: boolean;
 }
 
 export interface Class {
@@ -27,7 +31,7 @@ export interface Student {
     dateOfBirth: string;
     genderId: number;
     address: string;
-    residenceId: number;
+    residenceId?: number;
     schoolId?: number;
     classId?: number;
     class?: Class;
@@ -108,8 +112,6 @@ export interface TypeUnit {
     unit: string;
 }
 
-
-
 export interface OmsIndexMeasurement {
     id: number;
     ageId: number;
@@ -129,4 +131,23 @@ export interface OmsIndexMeasurement {
 
 
 
+// Reports
+
+export interface ReportSomaoMM {
+    id: number;
+    firstName: string;
+    lastName: string;
+    cnp: string;
+    dateOfBirth: string; // Assuming ISO date format (YYYY-MM-DD)
+    gender: string;
+    residence: string;
+    grade: number;
+    measurementDate: string; // Assuming ISO date format (YYYY-MM-DD)
+    omsAge: number;
+    height: number;
+    weight: number;
+    resImc: number;
+    resHeight: number;
+    resWeight: number;
+};
 

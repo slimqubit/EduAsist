@@ -1,6 +1,11 @@
 // controllers/student.controller.js
 const db = require("../models");
 const SomatometricMeasurement = db.somatometricmeasurement;
+const Student = db.student;
+const TypeGender = db.type_gender;
+const Sequelize = require("sequelize");
+const sequelize = require('../models/database'); // Conexiunea la baza de date
+
 
 
 //const studentValidationSchema = require("../validation/student.validation");
@@ -30,6 +35,9 @@ exports.findAll = async (req, res) => {
     try {
         const studentId = req.params.studentId;
         if (!studentId) return res.status(400).send({ message: "Student ID is required" });
+
+        const grade = req.params.grade;
+
 
         const somatomm = await SomatometricMeasurement.findAll({ where: { studentId: studentId } });
         if (!somatomm) return res.status(404).send({ message: "Measurement not found." });
@@ -92,3 +100,63 @@ exports.delete = async (req, res) => {
     }
 };
 
+
+// Returnează un raport al măsurătorilor în functie de indicatorul "grade" astfel
+// grade from (0 .. 13): pentru elevi din 
+// grade === 101: pentru elevi din înv. primar
+// grade === 102: pentru elevi din înv. gimnazial
+// grade === 103: pentru elevi din înv. liceal
+// grade === 104: pentru elevi din înv. liceal + p
+// grade === 111: pentru elevii din toată școala
+
+
+exports.reportByGrade = async (req, res) => {
+    try {
+        const schoolId = req.params.schoolId;
+        if (!schoolId) return res.status(400).send({ message: "School ID is required" });
+        const grade = req.params.grade;
+        if (!grade) return res.status(400).send({ message: "Grade is required" });
+
+        let whereStatement = `WHERE S.schoolId = ${schoolId}`;
+    
+        switch (grade) {
+            case '101':
+                whereStatement = `${whereStatement} AND C.grade BETWEEN 0 and 4`;
+                break;
+            case '102':
+                whereStatement = `${whereStatement} AND C.grade BETWEEN 5 and 8`;
+                break;
+            case '103':
+                whereStatement = `${whereStatement} AND C.grade BETWEEN 9 and 12`;
+                break;
+            case '104':
+                whereStatement = `${whereStatement} AND C.grade BETWEEN 9 and 13`;
+                break;
+            case '111':
+                whereStatement = `${whereStatement}`;
+                break;
+            default:
+                whereStatement = `${whereStatement} AND C.grade = ${grade}`;
+                break;
+        }
+
+        const [results, metadata] = await sequelize.query(
+            `SELECT 
+	            S.id, S.firstName, S.lastName, S.cnp, S.dateOfBirth, TG.gender, TR.residence, C.grade,
+                SM.measurementDate, SM.omsAge, SM.height, SM.weight, SM.resImc, SM.resHeight, SM.resWeight
+            FROM Students S
+	            JOIN Type_Residence TR on S.residenceId = TR.id
+	            JOIN Type_Gender TG on S.genderId = TG.id
+	            JOIN Classes C on S.classId = C.id
+	            LEFT JOIN SomatometricMeasurements SM on S.id = SM.studentId
+            ${whereStatement};`,
+        );
+
+
+        if (!results) return res.status(404).send({ message: "Measurement not found." });
+        res.status(200).send(results);
+
+    } catch (err) {
+        res.status(500).send({ message: err.message || `Error retrieving class with id=${classId}` });
+    }
+};
