@@ -21,6 +21,10 @@ const SchoolInfo = () => {
         county: '',
         address: '',
         residenceId: 0,
+        has101grades: false,
+        has102grades: false,
+        has103grades: false,
+        has104grades: false,
     });
 
 

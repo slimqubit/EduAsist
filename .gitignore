@@ -134,5 +134,9 @@ Resources
 Readme.txt
 eduasist_frontend/Readme.md
 eduasist_backend/config/*.sql
+eduasist_backend/config/gazduire.txt
+eduasist_backend/sslcert/*
 
 package-lock.json
+
+start.dev.cmd

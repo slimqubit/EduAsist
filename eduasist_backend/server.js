@@ -4,6 +4,10 @@ require('dotenv').config();
 
 
 const fs = require('fs');
+var http = require('http');
+var https = require('https');
+var privateKey = fs.readFileSync('sslcert/server.key', 'utf8');
+var certificate = fs.readFileSync('sslcert/server.crt', 'utf8');
 
 // Check the environment
 const isProduction = process.env.NODE_ENV === 'production';
@@ -25,6 +29,7 @@ if (isProduction) {
     console.log('Running in development mode, logging to console.');
 }
 
+var credentials = { key: privateKey, cert: certificate };
 const express = require("express");
 const app = express();
 
@@ -67,7 +72,19 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}.`);
+const HTTP_PORT = process.env.HTTP_PORT || 8080;
+const HTTPS_PORT = process.env.HTTPS_PORT || 8081;
+
+//app.listen(PORT, () => {
+//    console.log(`Server is running on port ${PORT}.`);
+//});
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(HTTP_PORT, () => {
+    console.log(`Server is handling http requests on port ${HTTP_PORT}.`);
+});
+httpsServer.listen(HTTPS_PORT, () => {
+    console.log(`Server is handling https requests on port ${HTTPS_PORT}.`);
 });

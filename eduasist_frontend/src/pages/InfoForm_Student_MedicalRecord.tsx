@@ -46,7 +46,8 @@ const InfoStudentMedicalRecordForm: React.FC = () => {
     const navigate = useNavigate();
 
     //    const returnToState = useState<string>(`${location.pathname}`);
-    const [returnToState, setReturnToState] = useState<string>(classId ? `${location.pathname}?classId=${classId}` : `${location.pathname}`);
+    //const [returnToState, setReturnToState] = useState<string>(classId ? `${location.pathname}?classId=${classId}` : `${location.pathname}`);
+    const returnToState = useState<string>(classId ? `${location.pathname}?classId=${classId}` : `${location.pathname}`);
 
 
 

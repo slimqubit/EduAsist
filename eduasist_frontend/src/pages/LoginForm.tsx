@@ -71,6 +71,8 @@ const LoginForm: React.FC = () => {
                 <Col xs={12} md={4}>
                     <h2 className="text-center my-4">Autentificare</h2>
                     {error && <Alert key="danger" variant="danger">{error}</Alert>}
+                    <h1>Vite is running in %MODE%</h1>
+                    <p>Using data from %VITE_API_URL%</p>
                     <Form onSubmit={handleSubmit}>
                         <Form.Group controlId="formEmail" className="mb-3">
                             <Form.Label>Adresa de e-mail</Form.Label>

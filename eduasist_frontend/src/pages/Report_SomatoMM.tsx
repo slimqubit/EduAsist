@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Alert, Table } from 'react-bootstrap';
-import { useLocation, useParams, Link } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { LoadingData } from '../components/cmpUtils';
 
 
@@ -38,17 +38,17 @@ const ReportSomatoMM: React.FC = () => {
     const [reportSomaoMM, setReportSomaoMM] = useState<ReportSomaoMM[]>([]);
 
 
-    const [returnToState, setReturnToState] = useState<string>(classId ? `${location.pathname}?classId=${classId}` : `${location.pathname}`);
+    //const [returnToState, setReturnToState] = useState<string>(classId ? `${location.pathname}?classId=${classId}` : `${location.pathname}`);
 
 
     const handleClassChange = (classId: number | null) => {
         setClassId(classId);
         if (classId && classId !== 0) {
             storageService.setSelectedClass(classId);
-            setReturnToState(`${location.pathname}?classId=${classId}`);
+            //setReturnToState(`${location.pathname}?classId=${classId}`);
         } else {
             storageService.removeSelectedClass()
-            setReturnToState(`${location.pathname}`);
+            //setReturnToState(`${location.pathname}`);
         }
     };
 
